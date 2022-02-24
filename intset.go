@@ -138,3 +138,16 @@ func (s *IntSet) Copy() *IntSet {
 	copy(t.words, s.words)
 	return t
 }
+
+// Elems return the set as a slice of int.
+func (s *IntSet) Elems() []int {
+	var res []int
+	for i, word := range s.words {
+		for j := 0; j < N; j++ {
+			if word&(1<<j) != 0 {
+				res = append(res, i*N+j)
+			}
+		}
+	}
+	return res
+}
