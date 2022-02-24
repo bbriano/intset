@@ -6,21 +6,24 @@ import (
 	"fmt"
 )
 
+// N is 32 or 64 on 32-bit or 64-bit platform respectively.
+const N = 32 << (^uint(0) >> 63)
+
 // An IntSet is a set of small non-negative integers.
 // Its zero value represents the empty set.
 type IntSet struct {
-	words []uint64
+	words []uint
 }
 
 // Has reports whether the set contains the non-negative value x.
 func (s *IntSet) Has(x int) bool {
-	word, bit := x/64, uint(x%64)
+	word, bit := x/N, uint(x%N)
 	return word < len(s.words) && s.words[word]&(1<<bit) != 0
 }
 
 // Add adds the non-negative value x to the set.
 func (s *IntSet) Add(x int) {
-	word, bit := x/64, uint(x%64)
+	word, bit := x/N, uint(x%N)
 	for word >= len(s.words) {
 		s.words = append(s.words, 0)
 	}
@@ -46,14 +49,14 @@ func (s IntSet) String() string {
 		if word == 0 {
 			continue
 		}
-		for j := 0; j < 64; j++ {
+		for j := 0; j < N; j++ {
 			if word&(1<<j) == 0 {
 				continue
 			}
 			if buf.Len() > len("{") {
 				buf.WriteByte(' ')
 			}
-			fmt.Fprintf(&buf, "%d", i*64+j)
+			fmt.Fprintf(&buf, "%d", i*N+j)
 		}
 	}
 	buf.WriteByte('}')
@@ -67,7 +70,7 @@ func (s *IntSet) Len() int {
 		if word == 0 {
 			continue
 		}
-		for j := 0; j < 64; j++ {
+		for j := 0; j < N; j++ {
 			if word&(1<<j) != 0 {
 				n++
 			}
@@ -78,7 +81,7 @@ func (s *IntSet) Len() int {
 
 // Remove removes x from the set.
 func (s *IntSet) Remove(x int) {
-	word, bit := x/64, uint(x%64)
+	word, bit := x/N, uint(x%N)
 	if word >= len(s.words) {
 		return
 	}
@@ -93,7 +96,7 @@ func (s *IntSet) Clear() {
 // Copy returns a copy of the set.
 func (s *IntSet) Copy() *IntSet {
 	t := &IntSet{}
-	t.words = make([]uint64, len(s.words))
+	t.words = make([]uint, len(s.words))
 	copy(t.words, s.words)
 	return t
 }
