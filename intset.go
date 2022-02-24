@@ -92,7 +92,7 @@ func (s *IntSet) Clear() {
 
 // Copy returns a copy of the set.
 func (s *IntSet) Copy() *IntSet {
-	var t *IntSet
+	t := &IntSet{}
 	t.words = make([]uint64, len(s.words))
 	copy(t.words, s.words)
 	return t
